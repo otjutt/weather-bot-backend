@@ -15,6 +15,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 // Routes
+require('./routes')(app);
 app.get('/', (req, res) => {
     res.status(200).send({
         message: 'Hello World!',
