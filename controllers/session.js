@@ -11,10 +11,20 @@ async function create(req, res) {
         console.log('Error! Exception in session create API.');
         console.log(e.message);
         return res.status(400).send({
-            message: "Something went wrong."
+            status: 'error',
+            code: 400,
+            message: 'Error! Something went wrong.',
+            data: null
         });
     }
-    return res.status(201).send(session);
+
+    // Success response.
+    return res.status(201).send({
+        status: 'success',
+        code: 201,
+        message: 'Success! Created session.',
+        data: session
+    });
 }
 
 async function list(req, res) {
@@ -25,10 +35,20 @@ async function list(req, res) {
         console.log('Error! Exception in session list API.');
         console.log(e.message);
         return res.status(400).send({
-            message: "Something went wrong."
+            status: 'error',
+            code: 400,
+            message: 'Error! Something went wrong.',
+            data: null
         });
     }
-    return res.status(200).send(sessions);
+
+    // Success response.
+    return res.status(200).send({
+        status: 'success',
+        code: 200,
+        message: 'Success! Listed sessions.',
+        data: sessions
+    });
 }
 
 async function update(req, res) {
@@ -44,13 +64,19 @@ async function update(req, res) {
         console.log('Error! Exception in session update API.');
         console.log(e.message);
         return res.status(400).send({
-            message: "Something went wrong."
+            status: 'error',
+            code: 400,
+            message: 'Error! Something went wrong.',
+            data: null
         });
     }
     if (session === null) {
-        res.status(404).send({
-            error: "Error! Session not found."
-        })
+        return res.status(404).send({
+            status: 'error',
+            code: 404,
+            message: 'Error! Session not found.',
+            data: null
+        });
     }
 
     // Update object.
@@ -60,8 +86,13 @@ async function update(req, res) {
     }
     await session.save();
 
-    // Return response.
-    return res.status(200).send(session)
+    // Success response.
+    return res.status(200).send({
+        status: 'success',
+        code: 200,
+        message: 'Success! Updated session.',
+        data: session
+    });
 }
 
 async function read(req, res) {
@@ -76,16 +107,28 @@ async function read(req, res) {
         console.log('Error! Exception in session read API.');
         console.log(e.message);
         return res.status(400).send({
-            message: "Something went wrong."
+            status: 'error',
+            code: 400,
+            message: 'Error! Something went wrong.',
+            data: null
         });
     }
     if (session === null) {
         return res.status(404).send({
-            error: "Session not found!"
-        })
+            status: 'error',
+            code: 404,
+            message: 'Error! Session not found.',
+            data: null
+        });
     }
 
-    return res.send(session);
+    // Success response.
+    return res.status(200).send({
+        status: 'success',
+        code: 200,
+        message: 'Success! Read session.',
+        data: session
+    });
 }
 
 module.exports = { create, list, update, read };
