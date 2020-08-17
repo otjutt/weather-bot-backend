@@ -16,6 +16,9 @@ async function getWeather(
 
     // START - weather API
     let location = cities[0];
+
+    // TODO: Caching with small expiry time can be added here against location.
+
     let responseWeather = await OpenWeatherService.getTemperatureDetails(location);
     if (responseWeather.status === 'success') {
         responseWeather = responseWeather.data;

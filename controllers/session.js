@@ -1,4 +1,5 @@
 const { Session } = require('../models/index');
+const Validator = require('validatorjs');
 
 async function create(req, res) {
     let session = null;
@@ -30,7 +31,11 @@ async function create(req, res) {
 async function list(req, res) {
     let sessions = null;
     try {
-        sessions = await Session.findAll();
+        sessions = await Session.findAll({
+            order: [
+                ['isActive', 'DESC']
+            ]
+        });
     } catch (e) {
         console.log('Error! Exception in session list API.');
         console.log(e.message);
@@ -52,6 +57,19 @@ async function list(req, res) {
 }
 
 async function update(req, res) {
+    let validation = new Validator(req.body, {
+        isActive: 'required|boolean'
+    });
+    if (validation.fails()) {
+        let data = {
+            status: 'error',
+            code: 422,
+            message: 'Error! Validation errors.',
+            data: validation.errors.all()
+        };
+        return res.status(data.code).send(data);
+    }
+
     // Check if object exists.
     let session = null;
     try {

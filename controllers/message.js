@@ -2,9 +2,25 @@ const { Message } = require('../models/index');
 const WitService = require('../service/wit-service');
 const BotService = require('../service/bot-service');
 const IntentWeather = require('../intent/intent-weather');
+const IntentGreeting = require('../intent/intent-greeting');
 const MessageService = require('../service/message-service');
+const Validator = require('validatorjs');
 
 async function create(req, res) {
+    let validation = new Validator(req.body, {
+        sessionId: 'required|integer',
+        message: 'required|string'
+    });
+    if (validation.fails()) {
+        let data = {
+            status: 'error',
+            code: 422,
+            message: 'Error! Validation errors.',
+            data: validation.errors.all()
+        };
+        return res.status(data.code).send(data);
+    }
+
     let inputSessionId = req.body.sessionId;
     let inputMessage = req.body.message;
 
@@ -18,13 +34,14 @@ async function create(req, res) {
         return res.status(data.code).send(data);
     }
 
+    // TODO: Caching with small expiry time can be added here against inputMessage.
+
     // Send message to WIT to get cities and intents.
     data = await WitService.process(inputMessage);
     if (data.status === 'error') {
         return res.status(data.code).send(data);
     }
 
-    // Map intents in a hashmap.
     let intentMap = data.data.intents;
     let cities = data.data.cities;
 
@@ -41,6 +58,11 @@ async function create(req, res) {
     // Intent weather
     if (intentMap.has('get_weather')) {
         data = await IntentWeather.getWeather(inputSessionId, cities);
+        return res.status(data.code).send(data);
+    }
+    // Intent greeting
+    if (intentMap.has('greeting')) {
+        data = await IntentGreeting.getGreeting(inputSessionId);
         return res.status(data.code).send(data);
     }
 
