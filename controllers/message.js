@@ -66,10 +66,20 @@ async function list(req, res) {
         console.log('Error! Exception in message list API.');
         console.log(e.message);
         return res.status(400).send({
-            message: "Something went wrong."
+            status: 'error',
+            code: 400,
+            message: 'Error! Something went wrong.',
+            data: null
         });
     }
-    return res.send(messages);
+
+    // Success response.
+    return res.status(200).send({
+        status: 'success',
+        code: 200,
+        message: 'Success! Listed messages.',
+        data: messages
+    });
 }
 
 module.exports = { create, list };
